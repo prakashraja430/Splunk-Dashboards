@@ -1,0 +1,278 @@
+<form theme="dark" hideEdit="true">
+  <label>Cisco Umbrella</label>
+  <fieldset submitButton="false">
+    <input type="time" token="field1">
+      <label></label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Network Breakdown</title>
+      <search><query></query></search>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Total Requests</title>
+        <search>
+          <query>index="cisco-umbrella" action=* | timechart  count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+      <table>
+        <title>Total Requests by Category</title>
+        <search>
+          <query>index="cisco-umbrella" | stats count by category | sort -count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">6</option>
+      </table>
+    </panel>
+    <panel>
+      <chart>
+        <title>Total Blocks</title>
+        <search>
+          <query>index="cisco-umbrella" action=blocked | timechart  count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+      <table>
+        <title>Total Blocks by Category</title>
+        <search>
+          <query>index="cisco-umbrella" action=blocked | stats count by category | sort -count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">6</option>
+      </table>
+    </panel>
+    <panel>
+      <chart>
+        <title>Total Security Blocks by Category</title>
+        <search id="BS1">
+          <query>index="cisco-umbrella" (blocked_category=Application* OR blocked_category=Malware OR blocked_category="Command and Control" OR blocked_category=Cryptomining OR blocked_category=Phishing OR blocked_category="Potentially Harmful") | stats count by blocked_category </query>
+          <earliest>-7d@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.abbreviation">none</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.abbreviation">none</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.abbreviation">none</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.mode">standard</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.lineWidth">2</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+      </chart>
+      <table>
+        <title>Total Security Blocks by Category</title>
+        <search base="BS1">
+          <query> | sort -count</query>
+        </search>
+        <option name="count">6</option>
+      </table>
+    </panel>
+  </row>
+<row>
+    <panel>
+      <title>Security Categories</title>
+      <search><query></query></search>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Malware Blocks</title>
+        <search>
+          <query>index="cisco-umbrella" blocked_category="Malware" | timechart  count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+      <chart>
+        <title>Pornography Blocks</title>
+        <search>
+          <query>index="cisco-umbrella" blocked_category=Porn* | timechart  count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Command and Control Blocks</title>
+        <search>
+          <query>index="cisco-umbrella" blocked_category="Command and Control" | timechart  count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+      <chart>
+        <title>Application Blocks</title>
+        <search>
+          <query>index="cisco-umbrella" blocked_category="Application*" | timechart  count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Phishing Blocks</title>
+        <search>
+          <query>index="cisco-umbrella" blocked_category="Phishing" | timechart  count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+      <chart>
+        <title>Dynamic DNS Blocks</title>
+        <search>
+          <query>index="cisco-umbrella" blocked_category="Dynamic DNS" | timechart  count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Potentially Harmful Blocks</title>
+        <search>
+          <query>index="cisco-umbrella" blocked_category="Potentially Harmful" | timechart  count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+      <chart>
+        <title>DNS Tunneling VPN Blocks</title>
+        <search>
+          <query>index="cisco-umbrella" blocked_category="DNS Tunneling VPN" | timechart  count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Flagged Categories</title>
+      <search><query></query></search>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Top 10 Flagged Categories</title>
+        <search>
+          <query>
+          index="cisco-umbrella" | stats count by category | sort - count |head 10
+          </query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Identities</title>
+      <search><query></query></search>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Allowed</title>
+        <search>
+          <query>index="cisco-umbrella" action=allowed | stats count by identities | sort -count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Blocked</title>
+        <search>
+          <query>index="cisco-umbrella" action=blocked | stats count by identities | sort -count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Proxied</title>
+        <search>
+          <query>index="cisco-umbrella" action=proxied | stats count by identities | sort -count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

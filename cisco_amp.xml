@@ -1,0 +1,252 @@
+<form theme="dark">
+  <label>Cisco AMP</label>
+  <fieldset submitButton="false">
+    <input type="time" token="field1">
+      <label></label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>Vulnerable Application Detected</title>
+        <search>
+          <query>index=cisco-amp event.event_type="Vulnerable Application Detected" 
+| rename event.timestamp as timestamp event.computer.hostname as hostname event.file.file_name as file_name event.severity as severity event.computer.network_addresses{}.ip as IP 
+| eval time=strftime(timestamp,"%Y-%m-%d %H:%M:%S")
+| timechart count by file_name</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+      <table>
+        <search>
+          <query>index=cisco-amp event.event_type="Vulnerable Application Detected" 
+| rename event.timestamp as timestamp event.computer.hostname as hostname event.file.file_name as file_name event.severity as severity event.computer.network_addresses{}.ip as IP 
+| eval time=strftime(timestamp,"%Y-%m-%d %H:%M:%S")
+| dedup hostname file_name
+| table time hostname file_name severity</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">8</option>
+        <option name="drilldown">cell</option>
+        <format type="color" field="severity">
+          <colorPalette type="map">{"Low":#00f71d,"Medium":#F7BC38,"High":#F70000}</colorPalette>
+        </format>
+        <drilldown>
+          <link target="_blank">/app/smart_security_monitoring_onprem/host_investigation_ssm?drilldown_host=$row.hostname$</link>
+        </drilldown>
+      </table>
+    </panel>
+    <panel>
+      <chart>
+        <title>Threat Detected</title>
+        <search>
+          <query>index="cisco-amp" event.event_type="Threat Detected" | rename event.computer.hostname as hostname event.timestamp as timestamp | eval time=strftime(timestamp,"%Y-%m-%d %H:%M:%S") | timechart count by file_name</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+      <table>
+        <search>
+          <query>index="cisco-amp" event.event_type="Threat Detected" | rename event.computer.hostname as hostname event.timestamp as timestamp | eval time=strftime(timestamp,"%Y-%m-%d %H:%M:%S") | table time hostname file_name file_path</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">5</option>
+        <option name="drilldown">cell</option>
+        <drilldown>
+          <link target="_blank">search?q=index%3D%22cisco-amp%22%20event.event_type%3D%22Threat%20Detected%22%20%7C%20rename%20event.computer.hostname%20as%20hostname%20event.timestamp%20as%20timestamp%20%7C%20eval%20time%3Dstrftime(timestamp%2C%22%25Y-%25m-%25d%20%25H%3A%25M%3A%25S%22)%20%7C%20table%20time%20hostname%20file_name%20file_path&amp;earliest=$field1.earliest$&amp;latest=$field1.latest$</link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Scan Failed</title>
+        <search>
+          <query>index="cisco-amp" event.event_type="Scan Failed" | rename event.scan.description as scan_description | timechart count by scan_description</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+      <table>
+        <search>
+          <query>index="cisco-amp" event.event_type="Scan Failed" | rename event.timestamp as timestamp event.computer.hostname as hostname event.scan.description as scan_description | eval time=strftime(timestamp,"%Y-%m-%d %H:%M:%S") | dedup hostname scan_description | table time hostname scan_description</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">5</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <drilldown>
+          <link target="_blank">search?q=index%3D%22cisco-amp%22%20event.event_type%3D%22Scan%20Failed%22%20%7C%20rename%20event.timestamp%20as%20timestamp%20event.computer.hostname%20as%20hostname%20event.scan.description%20as%20scan_description%20%7C%20eval%20time%3Dstrftime(timestamp%2C%22%25Y-%25m-%25d%20%25H%3A%25M%3A%25S%22)%20%7C%20table%20time%20hostname%20scan_description&amp;earliest=$field1.earliest$&amp;latest=$field1.latest$</link>
+        </drilldown>
+      </table>
+    </panel>
+    <panel>
+      <single>
+        <title>Orbital Install Failure</title>
+        <search>
+          <query>index="cisco-amp" event.event_type="Orbital Install Failure" | rename event.computer.hostname as hostname event.orbital.version as orbital_version | dedup hostname orbital_version | stats count(hostname)</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </single>
+      <table>
+        <search>
+          <query>index="cisco-amp" event.event_type="Orbital Install Failure" | rename event.timestamp as timestamp event.computer.hostname as hostname event.orbital.version as orbital_version | eval time=strftime(timestamp,"%Y-%m-%d %H:%M:%S") | dedup hostname orbital_version | table time hostname orbital_version</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">5</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <drilldown>
+          <link target="_blank">search?q=index%3D%22cisco-amp%22%20event.event_type%3D%22Orbital%20Install%20Failure%22%20%7C%20rename%20event.timestamp%20as%20timestamp%20event.computer.hostname%20as%20hostname%20event.orbital.version%20as%20orbital_version%20%7C%20eval%20time%3Dstrftime(timestamp%2C%22%25Y-%25m-%25d%20%25H%3A%25M%3A%25S%22)%20%7C%20table%20time%20hostname%20orbital_version&amp;earliest=$field1.earliest$&amp;latest=$field1.latest$</link>
+        </drilldown>
+      </table>
+    </panel>
+    <panel>
+      <single>
+        <title>Orbital Update Failure</title>
+        <search>
+          <query>index="cisco-amp" event.event_type="Orbital Update Failure" | stats count(event.computer.hostname)</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </single>
+      <table>
+        <search>
+          <query>index="cisco-amp" event.event_type="Orbital Update Failure" | rename event.timestamp as timestamp event.computer.hostname as hostname event.orbital.old_version as orbital_old_version event.orbital.version as orbital_version | eval time=strftime(timestamp,"%Y-%m-%d %H:%M:%S") | table time hostname orbital_old_version orbital_version</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">5</option>
+        <option name="drilldown">cell</option>
+        <drilldown>
+          <link target="_blank">search?q=index%3D%22cisco-amp%22%20event.event_type%3D%22Orbital%20Update%20Failure%22%20%7C%20rename%20event.timestamp%20as%20timestamp%20event.computer.hostname%20as%20hostname%20event.orbital.old_version%20as%20orbital_old_version%20event.orbital.version%20as%20orbital_version%20%7C%20eval%20time%3Dstrftime(timestamp%2C%22%25Y-%25m-%25d%20%25H%3A%25M%3A%25S%22)%20%7C%20table%20time%20hostname%20orbital_old_version%20orbital_version&amp;earliest=$field1.earliest$&amp;latest=$field1.latest$</link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <title>Quarantine Failure</title>
+        <search>
+          <query>index="cisco-amp" event.event_type="Quarantine Failure" | rename event.computer.hostname as hostname event.timestamp as timestamp event.error.description as error_description | dedup hostname error_description | stats count(hostname)</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+      </single>
+      <table>
+        <search>
+          <query>index="cisco-amp" event.event_type="Quarantine Failure" | rename event.computer.hostname as hostname event.timestamp as timestamp event.error.description as error_description | eval time=strftime(timestamp,"%Y-%m-%d %H:%M:%S") | dedup hostname error_description | table time hostname error_description</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">5</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <drilldown>
+          <link target="_blank">search?q=index%3D%22cisco-amp%22%20event.event_type%3D%22Quarantine%20Failure%22%20%7C%20rename%20event.computer.hostname%20as%20hostname%20event.timestamp%20as%20timestamp%20event.error.description%20as%20error_description%20%7C%20eval%20time%3Dstrftime(timestamp%2C%22%25Y-%25m-%25d%20%25H%3A%25M%3A%25S%22)%20%7C%20table%20time%20hostname%20error_description&amp;earliest=$field1.earliest$&amp;latest=$field1.latest$</link>
+        </drilldown>
+      </table>
+    </panel>
+    <panel>
+      <single>
+        <title>Product Update Failed</title>
+        <search>
+          <query>index="cisco-amp" event.event_type="Product Update Failed" | rename event.computer.hostname as hostname event.error.description as error_description | dedup hostname error_description | stats count(hostname)</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+      </single>
+      <table>
+        <search>
+          <query>index="cisco-amp" event.event_type="Product Update Failed" | rename event.computer.hostname as hostname event.timestamp as timestamp event.error.description as error_description | eval time=strftime(timestamp,"%Y-%m-%d %H:%M:%S") | dedup hostname error_description | table time hostname error_description</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">5</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <drilldown>
+          <link target="_blank">search?q=index%3D%22cisco-amp%22%20event.event_type%3D%22Product%20Update%20Failed%22%20%7C%20rename%20event.computer.hostname%20as%20hostname%20event.timestamp%20as%20timestamp%20event.error.description%20as%20error_description%20%7C%20eval%20time%3Dstrftime(timestamp%2C%22%25Y-%25m-%25d%20%25H%3A%25M%3A%25S%22)%20%7C%20table%20time%20hostname%20error_description&amp;earliest=$field1.earliest$&amp;latest=$field1.latest$</link>
+        </drilldown>
+      </table>
+    </panel>
+    <panel>
+       <single>
+        <title>Uninstall</title>
+        <search>
+          <query>index="cisco-amp" event.event_type="Uninstall" | stats count(event.computer.hostname)</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+      </single>
+      <table>
+        <search>
+          <query>index="cisco-amp" event.event_type="Uninstall" | rename event.computer.hostname as hostname event.timestamp as timestamp | eval time=strftime(timestamp,"%Y-%m-%d %H:%M:%S") | table time hostname</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">5</option>
+        <option name="drilldown">cell</option>
+        <drilldown>
+          <link target="_blank">search?q=index%3D%22cisco-amp%22%20event.event_type%3D%22Uninstall%22%20%7C%20rename%20event.computer.hostname%20as%20hostname%20event.timestamp%20as%20timestamp%20%7C%20eval%20time%3Dstrftime(timestamp%2C%22%25Y-%25m-%25d%20%25H%3A%25M%3A%25S%22)%20%7C%20table%20time%20hostname&amp;earliest=$field1.earliest$&amp;latest=$field1.latest$</link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Policy Update Failure</title>
+        <search>
+          <query>index="cisco-amp" event.event_type="Policy Update Failure" | rename event.computer.hostname as hostname event.timestamp as timestamp event.error.description as error_description | eval time=strftime(timestamp,"%Y-%m-%d %H:%M:%S") | dedup hostname error_description | table time hostname error_description</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">5</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <drilldown>
+          <link target="_blank">search?q=index%3D%22cisco-amp%22%20event.event_type%3D%22Policy%20Update%20Failure%22%20%7C%20rename%20event.computer.hostname%20as%20hostname%20event.timestamp%20as%20timestamp%20event.error.description%20as%20error_description%20%7C%20eval%20time%3Dstrftime(timestamp%2C%22%25Y-%25m-%25d%20%25H%3A%25M%3A%25S%22)%20%7C%20table%20time%20hostname%20error_description&amp;earliest=$field1.earliest$&amp;latest=$field1.latest$</link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Rootkit Detection</title>
+        <search>
+          <query>index="cisco-amp" event.event_type="Rootkit Detection" | rename event.computer.hostname as hostname event.timestamp as timestamp | eval time=strftime(timestamp,"%Y-%m-%d %H:%M:%S") | table time hostname file_name file_path</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="drilldown">cell</option>
+        <option name="count">5</option>
+        <drilldown>
+          <link target="_blank">search?q=index%3D%22cisco-amp%22%20event.event_type%3D%22Rootkit%20Detection%22%20%7C%20rename%20event.computer.hostname%20as%20hostname%20event.timestamp%20as%20timestamp%20%7C%20eval%20time%3Dstrftime(timestamp%2C%22%25Y-%25m-%25d%20%25H%3A%25M%3A%25S%22)%20%7C%20table%20time%20hostname%20file_name%20file_path&amp;earliest=$field1.earliest$&amp;latest=$field1.latest$</link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+</form>
