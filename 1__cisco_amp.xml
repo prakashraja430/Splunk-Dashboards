@@ -1,4 +1,4 @@
-<form theme="dark">
+<dashboard theme="dark">
   <label>Cisco AMP</label>
   <fieldset submitButton="false">
     <input type="time" token="field1">
@@ -249,4 +249,4 @@
       </table>
     </panel>
   </row>
-</form>
+</dashboard>
